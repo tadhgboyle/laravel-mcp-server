@@ -26,6 +26,7 @@ class LaravelMCPServerCommand extends Command
             $line = fgets($stdin);
             if ($line === false) {
                 usleep(100000);
+
                 continue;
             }
 
@@ -41,6 +42,7 @@ class LaravelMCPServerCommand extends Command
                 $message = json_decode($line, true, 512, JSON_THROW_ON_ERROR);
             } catch (\JsonException $e) {
                 Log::error('Invalid JSON: '.$e->getMessage());
+
                 continue;
             }
 
@@ -154,6 +156,6 @@ class LaravelMCPServerCommand extends Command
         $json = json_encode($message, JSON_THROW_ON_ERROR);
         file_put_contents('php://stdout', $json."\n");
         fflush(STDOUT);
-        Log::debug('Sent: ' . $json);
+        Log::debug('Sent: '.$json);
     }
 }

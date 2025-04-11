@@ -2,9 +2,9 @@
 
 namespace Aberdeener\LaravelMcpServer\Tests;
 
+use Aberdeener\LaravelMcpServer\LaravelMcpServerServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Aberdeener\LaravelMcpServer\LaravelMcpServerServiceProvider;
 
 class TestCase extends Orchestra
 {

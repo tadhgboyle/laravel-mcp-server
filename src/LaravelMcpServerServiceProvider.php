@@ -2,9 +2,9 @@
 
 namespace Aberdeener\LaravelMcpServer;
 
+use Aberdeener\LaravelMcpServer\Commands\LaravelMcpServerCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Aberdeener\LaravelMcpServer\Commands\LaravelMcpServerCommand;
 
 class LaravelMcpServerServiceProvider extends PackageServiceProvider
 {

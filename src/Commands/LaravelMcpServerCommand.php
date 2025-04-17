@@ -2,6 +2,12 @@
 
 namespace Aberdeener\LaravelMcpServer\Commands;
 
+use Aberdeener\LaravelMcpServer\Protocol\ErrorResponse;
+use Aberdeener\LaravelMcpServer\Protocol\InitializeResponse;
+use Aberdeener\LaravelMcpServer\Protocol\ToolListResponse;
+use Aberdeener\LaravelMcpServer\Request;
+use Aberdeener\LaravelMcpServer\Session;
+use Aberdeener\LaravelMcpServer\ToolRegistry;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -19,14 +25,16 @@ class LaravelMCPServerCommand extends Command
         if ($stdin === false) {
             Log::error('Failed to open STDIN.');
 
-            return 1;
+            return self::FAILURE;
         }
+
+        $session = new Session();
+        $request = new Request();
 
         while (! feof($stdin)) {
             $line = fgets($stdin);
             if ($line === false) {
                 usleep(100000);
-
                 continue;
             }
 
@@ -36,112 +44,68 @@ class LaravelMCPServerCommand extends Command
                 continue;
             }
 
-            Log::debug('Raw input: '.substr($line, 0, 200).(strlen($line) > 200 ? '...' : ''));
+            Log::debug('Raw input: ' . substr($line, 0, 200) . (strlen($line) > 200 ? '...' : ''));
 
-            try {
-                $message = json_decode($line, true, 512, JSON_THROW_ON_ERROR);
-            } catch (\JsonException $e) {
-                Log::error('Invalid JSON: '.$e->getMessage());
-
-                continue;
-            }
-
-            if (! is_array($message) || ! isset($message['jsonrpc']) || $message['jsonrpc'] !== '2.0') {
-                Log::error('Invalid JSON-RPC message: '.json_encode($message));
-
-                continue;
-            }
+            $message = json_decode($line, true);
 
             if (isset($message['method'])) {
+                if (!str_starts_with($message['method'], 'notifications/')) {
+                    $request->setId($message['id']);
+                }
+
                 $method = $message['method'];
 
                 if ($method === 'initialize') {
-                    $response = [
-                        'jsonrpc' => '2.0',
-                        'id' => $message['id'],
-                        'result' => [
-                            'protocolVersion' => '2024-11-05',
-                            'capabilities' => [
-                                'prompts' => [
-                                    'listChanged' => false,
-                                ],
-                                'resources' => [
-                                    'listChanged' => false,
-                                ],
-                                'tools' => [
-                                    'listChanged' => false,
-                                ],
-                            ],
-                            'serverInfo' => [
-                                'name' => 'Laravel MCP Server',
-                                'version' => '1.0.0',
-                            ],
-                        ],
-                    ];
-
+                    $response = new InitializeResponse(
+                        $session,
+                        $request
+                    )->toArray();
+                    $session->setInitialized();
                     $this->sendJsonRpc($response);
                 } elseif ($method === 'tools/list') {
-                    $this->sendJsonRpc([
+                    $response = new ToolListResponse(
+                        $session,
+                        $request,
+                        app(ToolRegistry::class),
+                    )->toArray();
+                    $this->sendJsonRpc($response);
+                } elseif ($method === 'tools/call') {
+                    $toolRegistry = app(ToolRegistry::class);
+                    $tool = $toolRegistry->getTool($message['params']['name']);
+                    $response = [
                         'id' => $message['id'],
                         'jsonrpc' => '2.0',
                         'result' => [
-                            'tools' => [
+                            'content' => [
                                 [
-                                    'name' => 'get_weather',
-                                    'description' => 'Get current weather information for a location',
-                                    'inputSchema' => [
-                                        'type' => 'object',
-                                        'properties' => [
-                                            'location' => [
-                                                'type' => 'string',
-                                                'description' => 'City name or zip code',
-                                            ],
-                                        ],
-                                        'required' => ['location'],
-                                    ],
+                                    'type' => 'text',
+                                    'text' => $tool->call($message['params']['arguments']['location']),
                                 ],
                             ],
+                            'isError' => false,
                         ],
-                    ]);
-                } elseif ($method === 'tools/call') {
-                    if ($message['params']['name'] === 'get_weather') {
-                        $location = $message['params']['arguments']['location'];
-                        $response = [
-                            'id' => $message['id'],
-                            'jsonrpc' => '2.0',
-                            'result' => [
-                                'content' => [
-                                    [
-                                        'type' => 'text',
-                                        'text' => "Current weather in {$location}:\nTemperature: 72°F\nConditions: Partly cloudy",
-                                    ],
-                                ],
-                                'isError' => false,
-                            ],
-                        ];
-                        $this->sendJsonRpc($response);
-                    }
+                    ];
+                    Log::info('Tool called: ' . $message['params']['name']);
+                    $this->sendJsonRpc($response);
                 } elseif ($method === 'notifications/initialized') {
                     Log::info('Received initialized notification.');
                 } elseif ($method === 'notifications/cancelled') {
                     Log::info('Received cancelled notification.');
                     break;
                 } else {
-                    Log::warning('Unhandled method: '.$method);
+                    Log::warning('Unhandled method: ' . $method);
                     if (isset($message['id'])) {
-                        $response = [
-                            'jsonrpc' => '2.0',
-                            'id' => $message['id'],
-                            'error' => [
-                                'code' => -32601,
-                                'message' => 'Method not found',
-                            ],
-                        ];
+                        $response = new ErrorResponse(
+                            $session,
+                            $request,
+                            'Method not found',
+                            -32601,
+                        )->toArray();
                         $this->sendJsonRpc($response);
                     }
                 }
             } else {
-                Log::warning('Unrecognized message format: '.json_encode($message));
+                Log::warning('Unrecognized message format: ' . json_encode($message));
             }
         }
 
@@ -154,8 +118,8 @@ class LaravelMCPServerCommand extends Command
     private function sendJsonRpc(array $message): void
     {
         $json = json_encode($message, JSON_THROW_ON_ERROR);
-        file_put_contents('php://stdout', $json."\n");
+        file_put_contents('php://stdout', $json . "\n");
         fflush(STDOUT);
-        Log::debug('Sent: '.$json);
+        Log::debug('Sent: ' . $json);
     }
 }

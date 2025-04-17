@@ -3,6 +3,7 @@
 namespace Aberdeener\LaravelMcpServer;
 
 use Aberdeener\LaravelMcpServer\Commands\LaravelMcpServerCommand;
+use Aberdeener\LaravelMcpServer\Protocol\Tools\Builtin\GetWeatherTool;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -18,8 +19,14 @@ class LaravelMcpServerServiceProvider extends PackageServiceProvider
         $package
             ->name('laravel-mcp-server')
             ->hasConfigFile()
-            ->hasViews()
-            ->hasMigration('create_laravel_mcp_server_table')
             ->hasCommand(LaravelMcpServerCommand::class);
+
+        $this->app->singleton(ToolRegistry::class);
+
+        $toolRegistry = $this->app->make(ToolRegistry::class);
+
+        $toolRegistry->registerTool(
+            new GetWeatherTool()
+        );
     }
 }

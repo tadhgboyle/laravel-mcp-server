@@ -26,6 +26,6 @@ class ToolRegistry
 
     public function allTools(): array
     {
-        return $this->tools->values()->map->toArray()->all();
+        return $this->tools->values()->map->toArray()->all()[0];
     }
 }

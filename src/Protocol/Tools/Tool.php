@@ -11,22 +11,22 @@ abstract class Tool
         private string $name,
         private string $description,
     ) {
-        if (!method_exists($this, 'call')) {
+        if (! method_exists($this, 'call')) {
             throw new \RuntimeException('call method must be implemented');
         }
     }
 
-    public final function name(): string
+    final public function name(): string
     {
         return $this->name;
     }
 
-    public final function description(): string
+    final public function description(): string
     {
         return $this->description;
     }
 
-    public final function inputSchema(): array
+    final public function inputSchema(): array
     {
         $callMethod = new ReflectionMethod($this, 'call');
         $parameters = $callMethod->getParameters();
@@ -35,18 +35,18 @@ abstract class Tool
         foreach ($parameters as $parameter) {
             $inputSchema[$parameter->getName()] = [
                 'type' => $parameter->getType()->getName(),
-                'description' => array_filter($parameter->getAttributes(), fn($attr) => $attr->getName() === ParameterDescription::class)[0]->newInstance()->description,
+                'description' => array_filter($parameter->getAttributes(), fn ($attr) => $attr->getName() === ParameterDescription::class)[0]->newInstance()->description,
             ];
         }
 
         return [
             'type' => 'object',
             'properties' => $inputSchema,
-            'required' => array_map(fn($param) => $param->getName(), array_filter($parameters, fn($param) => !$param->isOptional())),
+            'required' => array_map(fn ($param) => $param->getName(), array_filter($parameters, fn ($param) => ! $param->isOptional())),
         ];
     }
 
-    public final function toArray(): array
+    final public function toArray(): array
     {
         return [
             'name' => $this->name,

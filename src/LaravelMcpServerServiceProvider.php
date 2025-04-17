@@ -26,7 +26,7 @@ class LaravelMcpServerServiceProvider extends PackageServiceProvider
         $toolRegistry = $this->app->make(ToolRegistry::class);
 
         $toolRegistry->registerTool(
-            new GetWeatherTool()
+            new GetWeatherTool
         );
     }
 }

@@ -12,9 +12,9 @@ abstract class Response
         private Request $request,
     ) {}
 
-    public abstract function attributes(): array;
+    abstract public function attributes(): array;
 
-    private final function baseAttributes(): array
+    final private function baseAttributes(): array
     {
         return [
             'jsonrpc' => '2.0',
@@ -22,7 +22,7 @@ abstract class Response
         ];
     }
 
-    public final function toArray(): array
+    final public function toArray(): array
     {
         return array_merge($this->baseAttributes(), $this->attributes());
     }

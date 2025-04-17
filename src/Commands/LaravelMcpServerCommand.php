@@ -2,10 +2,10 @@
 
 namespace Aberdeener\LaravelMcpServer\Commands;
 
-use Aberdeener\LaravelMcpServer\Protocol\ErrorResponse;
-use Aberdeener\LaravelMcpServer\Protocol\InitializeResponse;
-use Aberdeener\LaravelMcpServer\Protocol\ToolCallResponse;
-use Aberdeener\LaravelMcpServer\Protocol\ToolListResponse;
+use Aberdeener\LaravelMcpServer\Protocol\Responses\ErrorResponse;
+use Aberdeener\LaravelMcpServer\Protocol\Responses\InitializeResponse;
+use Aberdeener\LaravelMcpServer\Protocol\Responses\ToolCallResponse;
+use Aberdeener\LaravelMcpServer\Protocol\Responses\ToolListResponse;
 use Aberdeener\LaravelMcpServer\Request;
 use Aberdeener\LaravelMcpServer\Session;
 use Aberdeener\LaravelMcpServer\ToolRegistry;
@@ -46,7 +46,7 @@ class LaravelMCPServerCommand extends Command
                 continue;
             }
 
-            Log::debug('Raw input: '.substr($line, 0, 200).(strlen($line) > 200 ? '...' : ''));
+            Log::debug('Raw input: '.$line);
 
             $message = json_decode($line, true);
 
@@ -77,7 +77,8 @@ class LaravelMCPServerCommand extends Command
                     $this->sendJsonRpc(new ToolCallResponse(
                         $session,
                         $request,
-                        $tool->call(...$message['params']['arguments']),
+                        $tool,
+                        $message['params']['arguments'],
                     )->toArray());
                 } elseif ($method === 'notifications/initialized') {
                     Log::info('Received initialized notification.');

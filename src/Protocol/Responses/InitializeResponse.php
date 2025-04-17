@@ -1,6 +1,6 @@
 <?php
 
-namespace Aberdeener\LaravelMcpServer\Protocol;
+namespace Aberdeener\LaravelMcpServer\Protocol\Responses;
 
 class InitializeResponse extends Response
 {

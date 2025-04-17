@@ -1,17 +1,17 @@
 <?php
 
-namespace Aberdeener\LaravelMcpServer\Protocol;
+namespace Aberdeener\LaravelMcpServer\Protocol\Responses;
 
 use Aberdeener\LaravelMcpServer\Request;
 use Aberdeener\LaravelMcpServer\Session;
-use Aberdeener\LaravelMcpServer\ToolRegistry;
 
-class ToolListResponse extends Response
+class ErrorResponse extends Response
 {
     public function __construct(
         private Session $session,
         private Request $request,
-        private ToolRegistry $toolRegistry,
+        private string $error,
+        private int $code,
     ) {
         parent::__construct($session, $request);
     }
@@ -19,10 +19,9 @@ class ToolListResponse extends Response
     public function attributes(): array
     {
         return [
-            'result' => [
-                'tools' => [
-                    $this->toolRegistry->allTools(),
-                ],
+            'error' => [
+                'code' => $this->code,
+                'message' => $this->error,
             ],
         ];
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Aberdeener\LaravelMcpServer\Protocol;
+namespace Aberdeener\LaravelMcpServer\Protocol\Responses;
 
 use Aberdeener\LaravelMcpServer\Request;
 use Aberdeener\LaravelMcpServer\Session;
@@ -14,7 +14,7 @@ abstract class Response
 
     abstract public function attributes(): array;
 
-    final private function baseAttributes(): array
+    private function baseAttributes(): array
     {
         return [
             'jsonrpc' => '2.0',

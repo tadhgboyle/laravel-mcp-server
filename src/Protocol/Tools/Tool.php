@@ -3,14 +3,17 @@
 namespace Aberdeener\LaravelMcpServer\Protocol\Tools;
 
 use Aberdeener\LaravelMcpServer\Protocol\Tools\Attributes\ParameterDescription;
+use Illuminate\Support\Str;
+use ReflectionClass;
 use ReflectionMethod;
 
+/**
+ * @method mixed call(...$args)
+ */
 abstract class Tool
 {
-    public function __construct(
-        private string $name,
-        private string $description,
-    ) {
+    public function __construct()
+    {
         if (! method_exists($this, 'call')) {
             throw new \RuntimeException('call method must be implemented');
         }
@@ -18,12 +21,22 @@ abstract class Tool
 
     final public function name(): string
     {
-        return $this->name;
+        $reflectionClass = new ReflectionClass($this);
+        $toolNameAttribute = collect($reflectionClass->getAttributes())->filter(fn ($attr) => $attr->getName() === Attributes\ToolName::class);
+        if ($toolNameAttribute->isEmpty()) {
+            return Str::beforeLast(Str::snake($reflectionClass->getShortName()), '_tool');
+        } else {
+            return $toolNameAttribute->first()->newInstance()->name;
+        }
     }
 
-    final public function description(): string
+    final public function resultType(): ResultType
     {
-        return $this->description;
+        $reflectionClass = new ReflectionClass($this);
+        $attributes = $reflectionClass->getAttributes();
+        $resultType = array_filter($attributes, fn ($attr) => $attr->getName() === Attributes\ToolResultType::class)[0]->newInstance()->resultType;
+
+        return $resultType;
     }
 
     final public function inputSchema(): array
@@ -48,9 +61,12 @@ abstract class Tool
 
     final public function toArray(): array
     {
+        $reflectionClass = new ReflectionClass($this);
+        $description = collect($reflectionClass->getAttributes())->filter(fn ($attr) => $attr->getName() === Attributes\ToolDescription::class)->first()->newInstance()->description;
+
         return [
-            'name' => $this->name,
-            'description' => $this->description,
+            'name' => $this->name(),
+            'description' => $description,
             'inputSchema' => $this->inputSchema(),
         ];
     }

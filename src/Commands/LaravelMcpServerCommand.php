@@ -45,7 +45,7 @@ class LaravelMCPServerCommand extends Command
                 continue;
             }
 
-            Log::debug('Raw input: '.substr($line, 0, 200).(strlen($line) > 200 ? '...' : ''));
+            Log::debug('Raw input: ' . substr($line, 0, 200) . (strlen($line) > 200 ? '...' : ''));
 
             $message = json_decode($line, true);
 
@@ -80,13 +80,13 @@ class LaravelMCPServerCommand extends Command
                             'content' => [
                                 [
                                     'type' => 'text',
-                                    'text' => $tool->call($message['params']['arguments']['location']),
+                                    'text' => $tool->call(...$message['params']['arguments']),
                                 ],
                             ],
                             'isError' => false,
                         ],
                     ];
-                    Log::info('Tool called: '.$message['params']['name']);
+                    Log::info('Tool called: ' . $message['params']['name']);
                     $this->sendJsonRpc($response);
                 } elseif ($method === 'notifications/initialized') {
                     Log::info('Received initialized notification.');
@@ -94,7 +94,7 @@ class LaravelMCPServerCommand extends Command
                     Log::info('Received cancelled notification.');
                     break;
                 } else {
-                    Log::warning('Unhandled method: '.$method);
+                    Log::warning('Unhandled method: ' . $method);
                     if (isset($message['id'])) {
                         $response = new ErrorResponse(
                             $session,
@@ -106,7 +106,7 @@ class LaravelMCPServerCommand extends Command
                     }
                 }
             } else {
-                Log::warning('Unrecognized message format: '.json_encode($message));
+                Log::warning('Unrecognized message format: ' . json_encode($message));
             }
         }
 
@@ -119,8 +119,8 @@ class LaravelMCPServerCommand extends Command
     private function sendJsonRpc(array $message): void
     {
         $json = json_encode($message, JSON_THROW_ON_ERROR);
-        file_put_contents('php://stdout', $json."\n");
+        file_put_contents('php://stdout', $json . "\n");
         fflush(STDOUT);
-        Log::debug('Sent: '.$json);
+        Log::debug('Sent: ' . $json);
     }
 }

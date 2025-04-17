@@ -4,6 +4,7 @@ namespace Aberdeener\LaravelMcpServer\Commands;
 
 use Aberdeener\LaravelMcpServer\Protocol\ErrorResponse;
 use Aberdeener\LaravelMcpServer\Protocol\InitializeResponse;
+use Aberdeener\LaravelMcpServer\Protocol\ToolCallResponse;
 use Aberdeener\LaravelMcpServer\Protocol\ToolListResponse;
 use Aberdeener\LaravelMcpServer\Request;
 use Aberdeener\LaravelMcpServer\Session;
@@ -45,7 +46,7 @@ class LaravelMCPServerCommand extends Command
                 continue;
             }
 
-            Log::debug('Raw input: '.substr($line, 0, 200).(strlen($line) > 200 ? '...' : ''));
+            Log::debug('Raw input: ' . substr($line, 0, 200) . (strlen($line) > 200 ? '...' : ''));
 
             $message = json_decode($line, true);
 
@@ -73,28 +74,18 @@ class LaravelMCPServerCommand extends Command
                 } elseif ($method === 'tools/call') {
                     $toolRegistry = app(ToolRegistry::class);
                     $tool = $toolRegistry->getTool($message['params']['name']);
-                    $response = [
-                        'id' => $message['id'],
-                        'jsonrpc' => '2.0',
-                        'result' => [
-                            'content' => [
-                                [
-                                    'type' => 'text',
-                                    'text' => $tool->call(...$message['params']['arguments']),
-                                ],
-                            ],
-                            'isError' => false,
-                        ],
-                    ];
-                    Log::info('Tool called: '.$message['params']['name']);
-                    $this->sendJsonRpc($response);
+                    $this->sendJsonRpc(new ToolCallResponse(
+                        $session,
+                        $request,
+                        $tool->call(...$message['params']['arguments']),
+                    )->toArray());
                 } elseif ($method === 'notifications/initialized') {
                     Log::info('Received initialized notification.');
                 } elseif ($method === 'notifications/cancelled') {
                     Log::info('Received cancelled notification.');
                     break;
                 } else {
-                    Log::warning('Unhandled method: '.$method);
+                    Log::warning('Unhandled method: ' . $method);
                     if (isset($message['id'])) {
                         $response = new ErrorResponse(
                             $session,
@@ -106,7 +97,7 @@ class LaravelMCPServerCommand extends Command
                     }
                 }
             } else {
-                Log::warning('Unrecognized message format: '.json_encode($message));
+                Log::warning('Unrecognized message format: ' . json_encode($message));
             }
         }
 
@@ -119,8 +110,8 @@ class LaravelMCPServerCommand extends Command
     private function sendJsonRpc(array $message): void
     {
         $json = json_encode($message, JSON_THROW_ON_ERROR);
-        file_put_contents('php://stdout', $json."\n");
+        file_put_contents('php://stdout', $json . "\n");
         fflush(STDOUT);
-        Log::debug('Sent: '.$json);
+        Log::debug('Sent: ' . $json);
     }
 }

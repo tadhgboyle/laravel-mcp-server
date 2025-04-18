@@ -1,59 +1,40 @@
-# This is my package laravel-mcp-server
+# laravel-mcp-server
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v//laravel-mcp-server.svg?style=flat-square)](https://packagist.org/packages//laravel-mcp-server)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status//laravel-mcp-server/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com//laravel-mcp-server/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status//laravel-mcp-server/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com//laravel-mcp-server/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt//laravel-mcp-server.svg?style=flat-square)](https://packagist.org/packages//laravel-mcp-server)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/tadhgboyle/laravel-mcp-server/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com//laravel-mcp-server/actions?query=workflow%3Arun-tests+branch%3Amain)
+[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/tadhgboyle/laravel-mcp-server/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com//laravel-mcp-server/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
+[![Total Downloads](https://img.shields.io/packagist/dt/tadhgboyle/laravel-mcp-server.svg?style=flat-square)](https://packagist.org/packages/tadhgboyle/laravel-mcp-server)
 
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
-
-## Support us
-
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/laravel-mcp-server.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/laravel-mcp-server)
-
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
-
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+This package provides a Model Context Protocol (MCP) server for Laravel applications. It allows you to create and register tools and prompts that can be used in conjunction with the MCP protocol.
+The MCP protocol is a standard for building tools that can interact with language models, enabling developers to create powerful applications that leverage the capabilities of these models.
+Read more about the MCP protocol https://modelcontextprotocol.io.
 
 ## Installation
 
 You can install the package via composer:
 
 ```bash
-composer require /laravel-mcp-server
-```
-
-You can publish and run the migrations with:
-
-```bash
-php artisan vendor:publish --tag="laravel-mcp-server-migrations"
-php artisan migrate
-```
-
-You can publish the config file with:
-
-```bash
-php artisan vendor:publish --tag="laravel-mcp-server-config"
-```
-
-This is the contents of the published config file:
-
-```php
-return [
-];
-```
-
-Optionally, you can publish the views using
-
-```bash
-php artisan vendor:publish --tag="laravel-mcp-server-views"
+composer require aberdeener/laravel-mcp-server
 ```
 
 ## Usage
 
 ```php
-$laravelMcpServer = new Aberdeener\LaravelMcpServer();
-echo $laravelMcpServer->echoPhrase('Hello, Aberdeener!');
+// AppServiceProvider.php
+/**
+ * Bootstrap any application services.
+ */
+public function boot(): void
+{
+    app(ToolRegistry::class)->registerTool(new GetWeatherTool);
+    app(PromptRegistry::class)->registerPrompt(new ReviewPhpCode);
+}
+```
+
+Experiment with the official [MCP inspector](https://github.com/modelcontextprotocol/inspector):
+
+```bash
+npx @modelcontextprotocol/inspector php /path/to/your/laravel/app/artisan mcp:stdio
 ```
 
 ## Testing
@@ -69,10 +50,6 @@ Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed re
 ## Contributing
 
 Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
-
-## Security Vulnerabilities
-
-Please review [our security policy](../../security/policy) on how to report security vulnerabilities.
 
 ## Credits
 

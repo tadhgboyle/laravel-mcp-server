@@ -15,6 +15,11 @@ class TestDummyPrompt extends Prompt
         #[ParameterDescription('The second argument')]
         string $code2 = '',
     ) {
-        return "Please evaluate the following PHP code for style issues: {$code1}, {$code2}";
+        $message = "Please evaluate the following PHP code for style issues: {$code1}";
+        if ($code2) {
+            $message .= ", {$code2}";
+        }
+
+        return $message;
     }
 }

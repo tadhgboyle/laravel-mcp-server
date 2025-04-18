@@ -4,13 +4,13 @@ use Aberdeener\LaravelMcpServer\Protocol\Exceptions\Entity\EntityAttributeMissin
 use Aberdeener\LaravelMcpServer\Protocol\Exceptions\Entity\EntityMustProvideCallMethodException;
 use Aberdeener\LaravelMcpServer\Protocol\Exceptions\Entity\InvalidEntityParameterTypeException;
 use Aberdeener\LaravelMcpServer\Protocol\Exceptions\Entity\MultipleEntityAttributesDefinedException;
+use Aberdeener\LaravelMcpServer\Protocol\Tools\Attributes\ToolDescription;
 use Aberdeener\LaravelMcpServer\Protocol\Tools\Attributes\ToolResultType;
 use Aberdeener\LaravelMcpServer\Protocol\Tools\ResultType;
 use Aberdeener\LaravelMcpServer\Protocol\Tools\Tool;
 use Aberdeener\LaravelMcpServer\Tests\Fixtures\ComplexTestDummyTool;
 use Aberdeener\LaravelMcpServer\Tests\Fixtures\NamedDummyTool;
 use Aberdeener\LaravelMcpServer\Tests\Fixtures\TestDummyTool;
-use Aberdeener\LaravelMcpServer\Protocol\Tools\Attributes\ToolDescription;
 use Illuminate\Support\Facades\DB;
 
 it('raises an exception if the call method is not defined', function () {
@@ -33,15 +33,14 @@ it('can get the description of the tool', function () {
 });
 
 it('raises an exception if no ToolDescription attribute is defined', function () {
-    new class extends Tool {
-        public function call()
-        {
-        }
+    new class extends Tool
+    {
+        public function call() {}
     }->description();
 })->throws(EntityAttributeMissingException::class, 'The ToolDescription attribute is missing.');
 
 it('raises an exception if multiple ToolDescription attributes are defined', function () {
-    new ToolWithMultipleAttributes()->description();
+    (new ToolWithMultipleAttributes)->description();
 })->throws(MultipleEntityAttributesDefinedException::class, 'Multiple ToolDescription attributes are defined.');
 
 it('can get the result type of the tool', function () {
@@ -50,14 +49,13 @@ it('can get the result type of the tool', function () {
 });
 
 it('raises an exception if multiple ToolResultType attributes are defined', function () {
-    new ToolWithMultipleAttributes()->resultType();
+    (new ToolWithMultipleAttributes)->resultType();
 })->throws(MultipleEntityAttributesDefinedException::class, 'Multiple ToolResultType attributes are defined.');
 
 it('raises an exception if the ToolResultType attribute is missing', function () {
-    new class extends Tool {
-        public function call()
-        {
-        }
+    new class extends Tool
+    {
+        public function call() {}
     }->resultType();
 })->throws(EntityAttributeMissingException::class, 'The ToolResultType attribute is missing.');
 
@@ -94,34 +92,30 @@ it('can get the input schema of the tool', function () {
 });
 
 it('raises an exception if a parameter is variadic', function () {
-    new class extends Tool {
-        public function call(...$args)
-        {
-        }
+    new class extends Tool
+    {
+        public function call(...$args) {}
     }->inputSchema();
 })->throws(InvalidEntityParameterTypeException::class, "Variadic parameters are not supported (parameter: 'args').");
 
 it('raises an exception if a parameter type is not defined', function () {
-    new class extends Tool {
-        public function call($arg1)
-        {
-        }
+    new class extends Tool
+    {
+        public function call($arg1) {}
     }->inputSchema();
 })->throws(InvalidEntityParameterTypeException::class, "Parameter type is not defined (parameter: 'arg1').");
 
 it('raises an exception if a parameter type is not builtin', function () {
-    new class extends Tool {
-        public function call(DB $arg1)
-        {
-        }
+    new class extends Tool
+    {
+        public function call(DB $arg1) {}
     }->inputSchema();
 })->throws(InvalidEntityParameterTypeException::class, "Parameter type is not a built-in type (parameter: 'arg1') (type: 'Illuminate\Support\Facades\DB').");
 
 it('raises an exception if a parameter type is not supported', function () {
-    new class extends Tool {
-        public function call(object $arg1)
-        {
-        }
+    new class extends Tool
+    {
+        public function call(object $arg1) {}
     }->inputSchema();
 })->throws(InvalidEntityParameterTypeException::class, "Parameter type is not supported (parameter: 'arg1') (type: 'object').");
 
@@ -162,7 +156,5 @@ it('can call the tool', function () {
 #[ToolDescription('Another example tool')]
 class ToolWithMultipleAttributes extends Tool
 {
-    public function call()
-    {
-    }
+    public function call() {}
 }

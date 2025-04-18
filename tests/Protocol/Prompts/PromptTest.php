@@ -2,8 +2,8 @@
 
 use Aberdeener\LaravelMcpServer\Protocol\Exceptions\Entity\EntityAttributeMissingException;
 use Aberdeener\LaravelMcpServer\Protocol\Exceptions\Entity\EntityMustProvideCallMethodException;
-use Aberdeener\LaravelMcpServer\Protocol\Exceptions\Entity\MultipleEntityAttributesDefinedException;
 use Aberdeener\LaravelMcpServer\Protocol\Exceptions\Entity\InvalidEntityParameterTypeException;
+use Aberdeener\LaravelMcpServer\Protocol\Exceptions\Entity\MultipleEntityAttributesDefinedException;
 use Aberdeener\LaravelMcpServer\Protocol\Prompts\Attributes\PromptDescription;
 use Aberdeener\LaravelMcpServer\Protocol\Prompts\Prompt;
 use Aberdeener\LaravelMcpServer\Tests\Fixtures\NamedDummyPrompt;
@@ -29,15 +29,14 @@ it('can get the description of the prompt', function () {
 });
 
 it('raises an exception if no PromptDescription attribute is defined', function () {
-    new class extends Prompt {
-        public function call()
-        {
-        }
+    new class extends Prompt
+    {
+        public function call() {}
     }->description();
 })->throws(EntityAttributeMissingException::class, 'The PromptDescription attribute is missing.');
 
 it('raises an exception if multiple PromptDescription attributes are defined', function () {
-    new PromptWithMultipleAttributes()->description();
+    (new PromptWithMultipleAttributes)->description();
 })->throws(MultipleEntityAttributesDefinedException::class, 'Multiple PromptDescription attributes are defined.');
 
 it('can get the arguments of the prompt', function () {
@@ -59,26 +58,23 @@ it('can get the arguments of the prompt', function () {
 });
 
 it('raises an exception if a parameter is variadic', function () {
-    new class extends Prompt {
-        public function call(...$args)
-        {
-        }
+    new class extends Prompt
+    {
+        public function call(...$args) {}
     }->arguments();
 })->throws(InvalidEntityParameterTypeException::class, "Variadic parameters are not supported (parameter: 'args').");
 
 it('raises an exception if a parameter type is not defined', function () {
-    new class extends Prompt {
-        public function call($arg1)
-        {
-        }
+    new class extends Prompt
+    {
+        public function call($arg1) {}
     }->arguments();
 })->throws(InvalidEntityParameterTypeException::class, "Parameter type is not defined (parameter: 'arg1').");
 
 it('raises an exception if a parameter type is not a string', function () {
-    new class extends Prompt {
-        public function call(int $arg1)
-        {
-        }
+    new class extends Prompt
+    {
+        public function call(int $arg1) {}
     }->arguments();
 })->throws(InvalidEntityParameterTypeException::class, "Parameter type must be string (parameter: 'arg1') (type: 'int').");
 
@@ -109,7 +105,7 @@ it('can call the prompt', function () {
     $result = $prompt->call('echo 1;', 'echo 2;');
 
     expect($result)->toBe(
-        "Please evaluate the following PHP code for style issues: echo 1;, echo 2;"
+        'Please evaluate the following PHP code for style issues: echo 1;, echo 2;'
     );
 });
 
@@ -117,7 +113,5 @@ it('can call the prompt', function () {
 #[PromptDescription('Another example prompt')]
 class PromptWithMultipleAttributes extends Prompt
 {
-    public function call()
-    {
-    }
+    public function call() {}
 }

@@ -20,5 +20,6 @@ class LaravelMcpServerServiceProvider extends PackageServiceProvider
             ->hasCommand(LaravelMcpServerCommand::class);
 
         $this->app->singleton(ToolRegistry::class);
+        $this->app->singleton(PromptRegistry::class);
     }
 }

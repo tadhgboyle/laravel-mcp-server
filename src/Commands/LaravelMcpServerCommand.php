@@ -6,6 +6,7 @@ use Aberdeener\LaravelMcpServer\PromptRegistry;
 use Aberdeener\LaravelMcpServer\Protocol\Responses\ErrorResponse;
 use Aberdeener\LaravelMcpServer\Protocol\Responses\InitializeResponse;
 use Aberdeener\LaravelMcpServer\Protocol\Responses\PingResponse;
+use Aberdeener\LaravelMcpServer\Protocol\Responses\PromptGetResponse;
 use Aberdeener\LaravelMcpServer\Protocol\Responses\PromptListResponse;
 use Aberdeener\LaravelMcpServer\Protocol\Responses\ToolCallResponse;
 use Aberdeener\LaravelMcpServer\Protocol\Responses\ToolListResponse;
@@ -78,7 +79,6 @@ class LaravelMCPServerCommand extends Command
                     $toolRegistry = app(ToolRegistry::class);
                     $tool = $toolRegistry->getTool($message['params']['name']);
                     if ($tool === null) {
-                        Log::warning('Tool not found: '.$message['params']['name']);
                         $response = new ErrorResponse(
                             $session,
                             $request,
@@ -95,15 +95,32 @@ class LaravelMCPServerCommand extends Command
                         $message['params']['arguments'],
                     )->toArray());
                 } elseif ($method === 'prompts/list') {
-                    Log::info('Received prompts/list request.');
                     $response = new PromptListResponse(
                         $session,
                         $request,
                         app(PromptRegistry::class),
                     )->toArray();
                     $this->sendJsonRpc($response);
+                } elseif ($method === 'prompts/get') {
+                    $promptRegistry = app(PromptRegistry::class);
+                    $prompt = $promptRegistry->getPrompt($message['params']['name']);
+                    if ($prompt === null) {
+                        $response = new ErrorResponse(
+                            $session,
+                            $request,
+                            "Unknown prompt: {$message['params']['name']}",
+                            -32602,
+                        )->toArray();
+                        $this->sendJsonRpc($response);
+                    }
+
+                    $this->sendJsonRpc(new PromptGetResponse(
+                        $session,
+                        $request,
+                        $prompt,
+                        $message['params']['arguments'],
+                    )->toArray());
                 } elseif ($method === 'prompts/initialize') {
-                    Log::info('Received prompts/initialize request.');
                     $response = new InitializeResponse(
                         $session,
                         $request
@@ -115,14 +132,12 @@ class LaravelMCPServerCommand extends Command
                     Log::info('Received cancelled notification.');
                     break;
                 } elseif ($method === 'ping') {
-                    Log::info('Received ping notification.');
                     $response = new PingResponse(
                         $session,
                         $request,
                     )->toArray();
                     $this->sendJsonRpc($response);
                 } else {
-                    Log::warning('Unhandled method: '.$method);
                     if (isset($message['id'])) {
                         $response = new ErrorResponse(
                             $session,

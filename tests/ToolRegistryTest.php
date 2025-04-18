@@ -41,11 +41,11 @@ it('can return all registered tools', function () {
                 'type' => 'object',
                 'properties' => [
                     'arg1' => [
-                        'type' => 'int',
+                        'type' => 'integer',
                         'description' => 'The first argument',
                     ],
                     'arg2' => [
-                        'type' => 'int',
+                        'type' => 'integer',
                         'description' => 'The second argument',
                     ],
                 ],
@@ -59,11 +59,11 @@ it('can return all registered tools', function () {
                 'type' => 'object',
                 'properties' => [
                     'arg1' => [
-                        'type' => 'int',
+                        'type' => 'integer',
                         'description' => 'The first argument',
                     ],
                     'arg2' => [
-                        'type' => 'int',
+                        'type' => 'integer',
                         'description' => 'The second argument',
                     ],
                 ],

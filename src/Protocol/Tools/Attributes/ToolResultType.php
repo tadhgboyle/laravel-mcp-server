@@ -9,6 +9,6 @@ use Attribute;
 class ToolResultType
 {
     public function __construct(
-        public ResultType $resultType,
+        public ResultType $value,
     ) {}
 }

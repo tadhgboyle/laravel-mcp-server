@@ -8,6 +8,6 @@ use Attribute;
 class ToolName
 {
     public function __construct(
-        public string $name,
+        public string $value,
     ) {}
 }

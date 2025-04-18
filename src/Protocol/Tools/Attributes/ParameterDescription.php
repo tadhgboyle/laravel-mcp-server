@@ -8,6 +8,6 @@ use Attribute;
 class ParameterDescription
 {
     public function __construct(
-        public string $description,
+        public string $value,
     ) {}
 }

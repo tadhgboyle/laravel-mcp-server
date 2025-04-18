@@ -26,11 +26,11 @@ it('can get the input schema of the tool', function () {
         'type' => 'object',
         'properties' => [
             'arg1' => [
-                'type' => 'int',
+                'type' => 'integer',
                 'description' => 'The first argument',
             ],
             'arg2' => [
-                'type' => 'int',
+                'type' => 'integer',
                 'description' => 'The second argument',
             ],
         ],
@@ -49,11 +49,11 @@ it('can get array serialized tool', function () {
             'type' => 'object',
             'properties' => [
                 'arg1' => [
-                    'type' => 'int',
+                    'type' => 'integer',
                     'description' => 'The first argument',
                 ],
                 'arg2' => [
-                    'type' => 'int',
+                    'type' => 'integer',
                     'description' => 'The second argument',
                 ],
             ],

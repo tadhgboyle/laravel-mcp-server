@@ -23,11 +23,11 @@ it('returns the list of tools in their array format', function () {
                         'type' => 'object',
                         'properties' => [
                             'arg1' => [
-                                'type' => 'int',
+                                'type' => 'integer',
                                 'description' => 'The first argument',
                             ],
                             'arg2' => [
-                                'type' => 'int',
+                                'type' => 'integer',
                                 'description' => 'The second argument',
                             ],
                         ],

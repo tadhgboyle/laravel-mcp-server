@@ -6,9 +6,8 @@ use Aberdeener\LaravelMcpServer\Tests\Fixtures\TestDummyTool;
 use Aberdeener\LaravelMcpServer\ToolRegistry;
 
 it('can return a named tool', function () {
-    $tool = new TestDummyTool;
-    $registry = new Aberdeener\LaravelMcpServer\ToolRegistry;
-    $registry->registerTool($tool);
+    $registry = new ToolRegistry;
+    $registry->registerTool(new TestDummyTool);
 
     $retrievedTool = $registry->getTool('test_dummy');
 
@@ -16,7 +15,7 @@ it('can return a named tool', function () {
 });
 
 it('can return null for an unregistered tool', function () {
-    $registry = new Aberdeener\LaravelMcpServer\ToolRegistry;
+    $registry = new ToolRegistry;
 
     $retrievedTool = $registry->getTool('non_existent_tool');
 

@@ -2,9 +2,11 @@
 
 namespace Aberdeener\LaravelMcpServer\Commands;
 
+use Aberdeener\LaravelMcpServer\PromptRegistry;
 use Aberdeener\LaravelMcpServer\Protocol\Responses\ErrorResponse;
 use Aberdeener\LaravelMcpServer\Protocol\Responses\InitializeResponse;
 use Aberdeener\LaravelMcpServer\Protocol\Responses\PingResponse;
+use Aberdeener\LaravelMcpServer\Protocol\Responses\PromptListResponse;
 use Aberdeener\LaravelMcpServer\Protocol\Responses\ToolCallResponse;
 use Aberdeener\LaravelMcpServer\Protocol\Responses\ToolListResponse;
 use Aberdeener\LaravelMcpServer\Request;
@@ -92,6 +94,21 @@ class LaravelMCPServerCommand extends Command
                         $tool,
                         $message['params']['arguments'],
                     )->toArray());
+                } elseif ($method === 'prompts/list') {
+                    Log::info('Received prompts/list request.');
+                    $response = new PromptListResponse(
+                        $session,
+                        $request,
+                        app(PromptRegistry::class),
+                    )->toArray();
+                    $this->sendJsonRpc($response);
+                } elseif ($method === 'prompts/initialize') {
+                    Log::info('Received prompts/initialize request.');
+                    $response = new InitializeResponse(
+                        $session,
+                        $request
+                    )->toArray();
+                    $this->sendJsonRpc($response);
                 } elseif ($method === 'notifications/initialized') {
                     Log::info('Received initialized notification.');
                 } elseif ($method === 'notifications/cancelled') {

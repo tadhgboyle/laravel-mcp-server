@@ -1,10 +1,11 @@
 <?php
 
-namespace Aberdeener\LaravelMcpServer\Protocol\Exceptions;
+namespace Aberdeener\LaravelMcpServer\Protocol\Exceptions\Entity;
 
+use Aberdeener\LaravelMcpServer\Protocol\Exceptions\LaravelMcpServerException;
 use Illuminate\Support\Str;
 
-class ToolAttributeMissingException extends LaravelMcpServerException
+class EntityAttributeMissingException extends LaravelMcpServerException
 {
     public function __construct(string $attribute)
     {

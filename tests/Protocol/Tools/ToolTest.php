@@ -1,9 +1,9 @@
 <?php
 
-use Aberdeener\LaravelMcpServer\Protocol\Exceptions\InvalidToolParameterTypeException;
-use Aberdeener\LaravelMcpServer\Protocol\Exceptions\MultipleToolAttributesDefinedException;
-use Aberdeener\LaravelMcpServer\Protocol\Exceptions\ToolAttributeMissingException;
-use Aberdeener\LaravelMcpServer\Protocol\Exceptions\ToolMustProvideCallMethodException;
+use Aberdeener\LaravelMcpServer\Protocol\Exceptions\Entity\EntityAttributeMissingException;
+use Aberdeener\LaravelMcpServer\Protocol\Exceptions\Entity\EntityMustProvideCallMethodException;
+use Aberdeener\LaravelMcpServer\Protocol\Exceptions\Entity\InvalidEntityParameterTypeException;
+use Aberdeener\LaravelMcpServer\Protocol\Exceptions\Entity\MultipleEntityAttributesDefinedException;
 use Aberdeener\LaravelMcpServer\Protocol\Tools\Attributes\ToolResultType;
 use Aberdeener\LaravelMcpServer\Protocol\Tools\ResultType;
 use Aberdeener\LaravelMcpServer\Protocol\Tools\Tool;
@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 
 it('raises an exception if the call method is not defined', function () {
     new class extends Tool {};
-})->throws(ToolMustProvideCallMethodException::class);
+})->throws(EntityMustProvideCallMethodException::class);
 
 it('can get the name of the tool without ToolName attribute', function () {
     $tool = new TestDummyTool;
@@ -38,11 +38,11 @@ it('raises an exception if no ToolDescription attribute is defined', function ()
         {
         }
     }->description();
-})->throws(ToolAttributeMissingException::class, 'The ToolDescription attribute is missing.');
+})->throws(EntityAttributeMissingException::class, 'The ToolDescription attribute is missing.');
 
 it('raises an exception if multiple ToolDescription attributes are defined', function () {
     new ToolWithMultipleAttributes()->description();
-})->throws(MultipleToolAttributesDefinedException::class, 'Multiple ToolDescription attributes are defined.');
+})->throws(MultipleEntityAttributesDefinedException::class, 'Multiple ToolDescription attributes are defined.');
 
 it('can get the result type of the tool', function () {
     $tool = new TestDummyTool;
@@ -51,7 +51,7 @@ it('can get the result type of the tool', function () {
 
 it('raises an exception if multiple ToolResultType attributes are defined', function () {
     new ToolWithMultipleAttributes()->resultType();
-})->throws(MultipleToolAttributesDefinedException::class, 'Multiple ToolResultType attributes are defined.');
+})->throws(MultipleEntityAttributesDefinedException::class, 'Multiple ToolResultType attributes are defined.');
 
 it('raises an exception if the ToolResultType attribute is missing', function () {
     new class extends Tool {
@@ -59,7 +59,7 @@ it('raises an exception if the ToolResultType attribute is missing', function ()
         {
         }
     }->resultType();
-})->throws(ToolAttributeMissingException::class, 'The ToolResultType attribute is missing.');
+})->throws(EntityAttributeMissingException::class, 'The ToolResultType attribute is missing.');
 
 it('can get the input schema of the tool', function () {
     $tool = new ComplexTestDummyTool;
@@ -99,7 +99,7 @@ it('raises an exception if a parameter is variadic', function () {
         {
         }
     }->inputSchema();
-})->throws(InvalidToolParameterTypeException::class, "Variadic parameters are not supported (parameter: 'args').");
+})->throws(InvalidEntityParameterTypeException::class, "Variadic parameters are not supported (parameter: 'args').");
 
 it('raises an exception if a parameter type is not defined', function () {
     new class extends Tool {
@@ -107,7 +107,7 @@ it('raises an exception if a parameter type is not defined', function () {
         {
         }
     }->inputSchema();
-})->throws(InvalidToolParameterTypeException::class, "Parameter type is not defined (parameter: 'arg1').");
+})->throws(InvalidEntityParameterTypeException::class, "Parameter type is not defined (parameter: 'arg1').");
 
 it('raises an exception if a parameter type is not builtin', function () {
     new class extends Tool {
@@ -115,7 +115,7 @@ it('raises an exception if a parameter type is not builtin', function () {
         {
         }
     }->inputSchema();
-})->throws(InvalidToolParameterTypeException::class, "Parameter type is not a built-in type (parameter: 'arg1') (type: 'Illuminate\Support\Facades\DB').");
+})->throws(InvalidEntityParameterTypeException::class, "Parameter type is not a built-in type (parameter: 'arg1') (type: 'Illuminate\Support\Facades\DB').");
 
 it('raises an exception if a parameter type is not supported', function () {
     new class extends Tool {
@@ -123,7 +123,7 @@ it('raises an exception if a parameter type is not supported', function () {
         {
         }
     }->inputSchema();
-})->throws(InvalidToolParameterTypeException::class, "Parameter type is not supported (parameter: 'arg1') (type: 'object').");
+})->throws(InvalidEntityParameterTypeException::class, "Parameter type is not supported (parameter: 'arg1') (type: 'object').");
 
 it('can get array serialized tool', function () {
     $tool = new TestDummyTool;

@@ -1,8 +1,10 @@
 <?php
 
-namespace Aberdeener\LaravelMcpServer\Protocol\Exceptions;
+namespace Aberdeener\LaravelMcpServer\Protocol\Exceptions\Entity;
 
-class InvalidToolParameterTypeException extends LaravelMcpServerException
+use Aberdeener\LaravelMcpServer\Protocol\Exceptions\LaravelMcpServerException;
+
+class InvalidEntityParameterTypeException extends LaravelMcpServerException
 {
     public function __construct(string $message, string $parameterName, ?string $typeName = null)
     {

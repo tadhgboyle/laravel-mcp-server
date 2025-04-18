@@ -27,8 +27,10 @@ class ToolCallResponse extends Response
             return [
                 'result' => [
                     'content' => [
-                        'type' => 'text',
-                        'text' => $toolCallResponse['error'],
+                        [
+                            'type' => 'text',
+                            'text' => $toolCallResponse['error'],
+                        ],
                     ],
                     'isError' => true,
                 ],
@@ -37,7 +39,9 @@ class ToolCallResponse extends Response
 
         return [
             'result' => [
-                'content' => $this->toolContent($toolCallResponse['response']),
+                'content' => [
+                    $this->toolContent($toolCallResponse['response']),
+                ],
                 'isError' => false,
             ],
         ];

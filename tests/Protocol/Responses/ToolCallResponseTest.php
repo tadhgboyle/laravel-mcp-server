@@ -12,8 +12,10 @@ it('returns error when error was raised during tool call', function () {
     expect($response->attributes())->toEqual([
         'result' => [
             'content' => [
-                'type' => 'text',
-                'text' => 'An error occurred',
+                [
+                    'type' => 'text',
+                    'text' => 'An error occurred',
+                ],
             ],
             'isError' => true,
         ],
@@ -26,8 +28,10 @@ it('returns tool response data for text result type', function () {
     expect($response->attributes())->toEqual([
         'result' => [
             'content' => [
-                'type' => 'text',
-                'text' => 3, // 1 + 2
+                [
+                    'type' => 'text',
+                    'text' => 3, // 1 + 2
+                ],
             ],
             'isError' => false,
         ],

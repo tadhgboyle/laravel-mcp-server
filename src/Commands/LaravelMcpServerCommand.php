@@ -4,6 +4,7 @@ namespace Aberdeener\LaravelMcpServer\Commands;
 
 use Aberdeener\LaravelMcpServer\Protocol\Responses\ErrorResponse;
 use Aberdeener\LaravelMcpServer\Protocol\Responses\InitializeResponse;
+use Aberdeener\LaravelMcpServer\Protocol\Responses\PingResponse;
 use Aberdeener\LaravelMcpServer\Protocol\Responses\ToolCallResponse;
 use Aberdeener\LaravelMcpServer\Protocol\Responses\ToolListResponse;
 use Aberdeener\LaravelMcpServer\Request;
@@ -74,6 +75,17 @@ class LaravelMCPServerCommand extends Command
                 } elseif ($method === 'tools/call') {
                     $toolRegistry = app(ToolRegistry::class);
                     $tool = $toolRegistry->getTool($message['params']['name']);
+                    if ($tool === null) {
+                        Log::warning('Tool not found: '.$message['params']['name']);
+                        $response = new ErrorResponse(
+                            $session,
+                            $request,
+                            "Unknown tool: {$message['params']['name']}",
+                            -32602,
+                        )->toArray();
+                        $this->sendJsonRpc($response);
+                    }
+
                     $this->sendJsonRpc(new ToolCallResponse(
                         $session,
                         $request,
@@ -85,6 +97,13 @@ class LaravelMCPServerCommand extends Command
                 } elseif ($method === 'notifications/cancelled') {
                     Log::info('Received cancelled notification.');
                     break;
+                } elseif ($method === 'ping') {
+                    Log::info('Received ping notification.');
+                    $response = new PingResponse(
+                        $session,
+                        $request,
+                    )->toArray();
+                    $this->sendJsonRpc($response);
                 } else {
                     Log::warning('Unhandled method: '.$method);
                     if (isset($message['id'])) {
@@ -105,7 +124,7 @@ class LaravelMCPServerCommand extends Command
         fclose($stdin);
         Log::info('MCP server stopped.');
 
-        return 0;
+        return self::SUCCESS;
     }
 
     private function sendJsonRpc(array $message): void

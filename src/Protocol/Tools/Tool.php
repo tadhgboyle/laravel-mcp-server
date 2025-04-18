@@ -3,6 +3,8 @@
 namespace Aberdeener\LaravelMcpServer\Protocol\Tools;
 
 use Aberdeener\LaravelMcpServer\Protocol\Exceptions\InvalidToolParameterTypeException;
+use Aberdeener\LaravelMcpServer\Protocol\Exceptions\MultipleToolAttributesDefinedException;
+use Aberdeener\LaravelMcpServer\Protocol\Exceptions\ToolAttributeMissingException;
 use Aberdeener\LaravelMcpServer\Protocol\Exceptions\ToolMustProvideCallMethodException;
 use Aberdeener\LaravelMcpServer\Protocol\Tools\Attributes\ParameterDescription;
 use Aberdeener\LaravelMcpServer\Protocol\Tools\Attributes\ToolDescription;
@@ -25,7 +27,6 @@ abstract class Tool
         'float' => 'number',
         'string' => 'string',
         'array' => 'array',
-        'object' => 'object',
     ];
 
     public function __construct()
@@ -43,39 +44,42 @@ abstract class Tool
         return $toolNameAttribute ?? Str::beforeLast(Str::snake($reflectionClass->getShortName()), '_tool');
     }
 
+    final public function description(): string
+    {
+        return $this->getAttributeValue(new ReflectionClass($this), ToolDescription::class);
+    }
+
     final public function resultType(): ResultType
     {
-        $resultType = $this->getAttributeValue(new ReflectionClass($this), ToolResultType::class);
-
-        return $resultType;
+        return $this->getAttributeValue(new ReflectionClass($this), ToolResultType::class);
     }
 
     final public function inputSchema(): array
     {
         $callMethod = new ReflectionMethod($this, 'call');
-        $parameters = $callMethod->getParameters();
+        $parameters = collect($callMethod->getParameters());
         $inputSchema = [];
 
         foreach ($parameters as $parameter) {
+            $parameterName = $parameter->getName();
+
             if ($parameter->isVariadic()) {
-                throw new InvalidToolParameterTypeException;
+                throw new InvalidToolParameterTypeException('Variadic parameters are not supported', $parameterName);
             }
 
             if (! $parameter->hasType()) {
-                throw new InvalidToolParameterTypeException;
+                throw new InvalidToolParameterTypeException('Parameter type is not defined', $parameterName);
             }
 
             $type = $parameter->getType();
-            if ($type === null) {
-                throw new InvalidToolParameterTypeException;
-            }
+            $typeName = $type->getName();
             if (! $type->isBuiltin()) {
-                throw new InvalidToolParameterTypeException;
+                throw new InvalidToolParameterTypeException('Parameter type is not a built-in type', $parameterName, $typeName);
             }
 
             $equivalentType = self::EQUIVALENT_TYPES[$type->getName()] ?? null;
             if ($equivalentType === null) {
-                throw new InvalidToolParameterTypeException;
+                throw new InvalidToolParameterTypeException('Parameter type is not supported', $parameterName, $typeName);
             }
 
             $inputSchema[$parameter->getName()] = [
@@ -87,17 +91,19 @@ abstract class Tool
         return [
             'type' => 'object',
             'properties' => $inputSchema,
-            'required' => array_map(fn ($param) => $param->getName(), array_filter($parameters, fn ($param) => ! $param->isOptional())),
+            'required' => $parameters->reject(function (ReflectionParameter $parameter) {
+                return $parameter->isOptional();
+            })->map(function (ReflectionParameter $parameter) {
+                return $parameter->getName();
+            })->values()->all(),
         ];
     }
 
     final public function toArray(): array
     {
-        $description = $this->getAttributeValue(new ReflectionClass($this), ToolDescription::class);
-
         return [
             'name' => $this->name(),
-            'description' => $description,
+            'description' => $this->description(),
             'inputSchema' => $this->inputSchema(),
         ];
     }
@@ -109,12 +115,12 @@ abstract class Tool
             if (! $raise) {
                 return null;
             } else {
-                throw new \RuntimeException('Attribute not found');
+                throw new ToolAttributeMissingException($attribute);
             }
         }
 
         if ($attributes->count() > 1) {
-            throw new \RuntimeException('Multiple attributes found');
+            throw new MultipleToolAttributesDefinedException($attribute);
         }
 
         return $attributes->first()->newInstance()->value;

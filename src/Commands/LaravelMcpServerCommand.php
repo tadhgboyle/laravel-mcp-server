@@ -16,7 +16,7 @@ use Aberdeener\LaravelMcpServer\ToolRegistry;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
-class LaravelMCPServerCommand extends Command
+class LaravelMcpServerCommand extends Command
 {
     protected $signature = 'mcp:stdio';
 

@@ -1,9 +1,9 @@
 <?php
 
 use Aberdeener\LaravelMcpServer\Protocol\Tools\Tool;
+use Aberdeener\LaravelMcpServer\Protocol\Tools\ToolRegistry;
 use Aberdeener\LaravelMcpServer\Tests\Fixtures\NamedDummyTool;
 use Aberdeener\LaravelMcpServer\Tests\Fixtures\TestDummyTool;
-use Aberdeener\LaravelMcpServer\ToolRegistry;
 
 it('can return a named tool', function () {
     $registry = new ToolRegistry;

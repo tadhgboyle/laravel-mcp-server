@@ -2,11 +2,11 @@
 
 use Aberdeener\LaravelMcpServer\Protocol\Exceptions\RequestException;
 use Aberdeener\LaravelMcpServer\Protocol\Responses\ToolCallResponse;
+use Aberdeener\LaravelMcpServer\Protocol\Tools\ToolRegistry;
 use Aberdeener\LaravelMcpServer\Request;
 use Aberdeener\LaravelMcpServer\Session;
 use Aberdeener\LaravelMcpServer\Tests\Fixtures\ErrorDummyTool;
 use Aberdeener\LaravelMcpServer\Tests\Fixtures\TestDummyTool;
-use Aberdeener\LaravelMcpServer\ToolRegistry;
 
 it('raises error when tool not found', function () {
     $request = new Request;

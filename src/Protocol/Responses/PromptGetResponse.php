@@ -2,10 +2,10 @@
 
 namespace Aberdeener\LaravelMcpServer\Protocol\Responses;
 
-use Aberdeener\LaravelMcpServer\PromptRegistry;
 use Aberdeener\LaravelMcpServer\Protocol\Error;
 use Aberdeener\LaravelMcpServer\Protocol\Exceptions\RequestException;
 use Aberdeener\LaravelMcpServer\Protocol\Prompts\Prompt;
+use Aberdeener\LaravelMcpServer\Protocol\Prompts\PromptRegistry;
 use Aberdeener\LaravelMcpServer\Request;
 use Aberdeener\LaravelMcpServer\Session;
 

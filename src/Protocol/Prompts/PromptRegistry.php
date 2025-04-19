@@ -1,8 +1,7 @@
 <?php
 
-namespace Aberdeener\LaravelMcpServer;
+namespace Aberdeener\LaravelMcpServer\Protocol\Prompts;
 
-use Aberdeener\LaravelMcpServer\Protocol\Prompts\Prompt;
 use Illuminate\Support\Collection;
 
 class PromptRegistry

@@ -6,9 +6,9 @@ use Aberdeener\LaravelMcpServer\Protocol\Error;
 use Aberdeener\LaravelMcpServer\Protocol\Exceptions\RequestException;
 use Aberdeener\LaravelMcpServer\Protocol\Tools\ResultType;
 use Aberdeener\LaravelMcpServer\Protocol\Tools\Tool;
+use Aberdeener\LaravelMcpServer\Protocol\Tools\ToolRegistry;
 use Aberdeener\LaravelMcpServer\Request;
 use Aberdeener\LaravelMcpServer\Session;
-use Aberdeener\LaravelMcpServer\ToolRegistry;
 use InvalidArgumentException;
 use Throwable;
 

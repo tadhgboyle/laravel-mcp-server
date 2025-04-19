@@ -1,10 +1,10 @@
 <?php
 
 use Aberdeener\LaravelMcpServer\Protocol\Responses\ToolListResponse;
+use Aberdeener\LaravelMcpServer\Protocol\Tools\ToolRegistry;
 use Aberdeener\LaravelMcpServer\Request;
 use Aberdeener\LaravelMcpServer\Session;
 use Aberdeener\LaravelMcpServer\Tests\Fixtures\TestDummyTool;
-use Aberdeener\LaravelMcpServer\ToolRegistry;
 
 it('returns the list of tools in their array format', function () {
     $toolRegistry = app(ToolRegistry::class);

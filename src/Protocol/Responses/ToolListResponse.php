@@ -2,9 +2,9 @@
 
 namespace Aberdeener\LaravelMcpServer\Protocol\Responses;
 
+use Aberdeener\LaravelMcpServer\Protocol\Tools\ToolRegistry;
 use Aberdeener\LaravelMcpServer\Request;
 use Aberdeener\LaravelMcpServer\Session;
-use Aberdeener\LaravelMcpServer\ToolRegistry;
 
 class ToolListResponse extends Response
 {

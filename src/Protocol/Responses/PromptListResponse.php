@@ -2,7 +2,7 @@
 
 namespace Aberdeener\LaravelMcpServer\Protocol\Responses;
 
-use Aberdeener\LaravelMcpServer\PromptRegistry;
+use Aberdeener\LaravelMcpServer\Protocol\Prompts\PromptRegistry;
 use Aberdeener\LaravelMcpServer\Request;
 use Aberdeener\LaravelMcpServer\Session;
 

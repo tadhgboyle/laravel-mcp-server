@@ -22,8 +22,8 @@ composer require aberdeener/laravel-mcp-server
 ```php
 // Within your AppServiceProvider.php
 
-use Aberdeener\LaravelMcpServer\ToolRegistry;
-use Aberdeener\LaravelMcpServer\PromptRegistry;
+use Aberdeener\LaravelMcpServer\Protocol\Tools\ToolRegistry;
+use Aberdeener\LaravelMcpServer\Protocol\Prompts\PromptRegistry;
 
 public function boot(): void
 {

@@ -1,8 +1,7 @@
 <?php
 
-namespace Aberdeener\LaravelMcpServer;
+namespace Aberdeener\LaravelMcpServer\Protocol\Tools;
 
-use Aberdeener\LaravelMcpServer\Protocol\Tools\Tool;
 use Illuminate\Support\Collection;
 
 class ToolRegistry

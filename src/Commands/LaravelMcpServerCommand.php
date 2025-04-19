@@ -24,7 +24,6 @@ class LaravelMcpServerCommand extends Command
         $stdin = fopen('php://stdin', 'r');
 
         $session = new Session;
-        $request = new Request;
 
         while (! feof($stdin)) {
             $line = fgets($stdin);
@@ -40,6 +39,8 @@ class LaravelMcpServerCommand extends Command
 
             $message = json_decode($line, true);
 
+            $request = new Request;
+
             $request->setMessage($message);
 
             $method = $message['method'];
@@ -53,9 +54,9 @@ class LaravelMcpServerCommand extends Command
                     Log::info('Received cancelled notification.');
                     break;
                 }
-            } else {
-                $request->setId($message['id']);
             }
+
+            $request->setId($message['id']);
 
             if (! array_key_exists($method, Response::REQUEST_HANDLERS)) {
                 $this->sendResponse(new ErrorResponse(

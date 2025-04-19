@@ -12,7 +12,7 @@ use ReflectionParameter;
 /**
  * @method mixed call(...$args)
  */
-class Entity
+abstract class Entity
 {
     final public function __construct()
     {
@@ -20,6 +20,8 @@ class Entity
             throw new EntityMustProvideCallMethodException;
         }
     }
+
+    abstract public function toArray(): array;
 
     final protected function getAttributeValue(ReflectionClass|ReflectionParameter $reflector, $attribute, bool $raise = true)
     {

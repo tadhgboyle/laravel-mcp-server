@@ -1,7 +1,7 @@
 <?php
 
-use Aberdeener\LaravelMcpServer\PromptRegistry;
 use Aberdeener\LaravelMcpServer\Protocol\Prompts\Prompt;
+use Aberdeener\LaravelMcpServer\Protocol\Prompts\PromptRegistry;
 use Aberdeener\LaravelMcpServer\Tests\Fixtures\NamedDummyPrompt;
 use Aberdeener\LaravelMcpServer\Tests\Fixtures\TestDummyPrompt;
 

@@ -1,6 +1,6 @@
 <?php
 
-use Aberdeener\LaravelMcpServer\PromptRegistry;
+use Aberdeener\LaravelMcpServer\Protocol\Prompts\PromptRegistry;
 use Aberdeener\LaravelMcpServer\Protocol\Responses\PromptListResponse;
 use Aberdeener\LaravelMcpServer\Request;
 use Aberdeener\LaravelMcpServer\Session;

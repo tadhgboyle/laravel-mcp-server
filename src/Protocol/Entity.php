@@ -14,7 +14,7 @@ use ReflectionParameter;
  */
 abstract class Entity
 {
-    final public function __construct()
+    public function __construct()
     {
         if (! method_exists($this, 'call')) {
             throw new EntityMustProvideCallMethodException;

@@ -14,6 +14,9 @@ abstract class Response
         'tools/call' => ToolCallResponse::class,
         'prompts/list' => PromptListResponse::class,
         'prompts/get' => PromptGetResponse::class,
+        'resources/list' => ResourceListResponse::class,
+        'resources/read' => ResourceReadResponse::class,
+        // 'resources/templates/list' => ResourceTemplateListResponse::class,
     ];
 
     public function __construct(

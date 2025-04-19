@@ -10,7 +10,7 @@ it('returns the list of prompts in their array format', function () {
     $promptRegistry = app(PromptRegistry::class);
     $promptRegistry->registerPrompt(new TestDummyPrompt);
 
-    $response = new PromptListResponse(new Session, new Request, $promptRegistry);
+    $response = new PromptListResponse(new Session, new Request);
     $attributes = $response->attributes();
 
     expect($attributes)->toBe([

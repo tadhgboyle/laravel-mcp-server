@@ -4,6 +4,7 @@ namespace Aberdeener\LaravelMcpServer;
 
 use Aberdeener\LaravelMcpServer\Commands\LaravelMcpServerCommand;
 use Aberdeener\LaravelMcpServer\Protocol\Prompts\PromptRegistry;
+use Aberdeener\LaravelMcpServer\Protocol\Resources\ResourceRegistry;
 use Aberdeener\LaravelMcpServer\Protocol\Tools\ToolRegistry;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -23,5 +24,6 @@ class LaravelMcpServerServiceProvider extends PackageServiceProvider
 
         $this->app->singleton(ToolRegistry::class);
         $this->app->singleton(PromptRegistry::class);
+        $this->app->singleton(ResourceRegistry::class);
     }
 }

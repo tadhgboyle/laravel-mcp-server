@@ -81,7 +81,7 @@ class LaravelMcpServerCommand extends Command
                     $session,
                     $request,
                     $exception->getMessage(),
-                    $exception->error,
+                    Error::from($exception->getCode()),
                 ));
 
                 continue;

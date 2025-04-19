@@ -7,6 +7,15 @@ use Aberdeener\LaravelMcpServer\Session;
 
 abstract class Response
 {
+    public final const REQUEST_HANDLERS = [
+        'initialize' => InitializeResponse::class,
+        'ping' => PingResponse::class,
+        'tools/list' => ToolListResponse::class,
+        'tools/call' => ToolCallResponse::class,
+        'prompts/list' => PromptListResponse::class,
+        'prompts/get' => PromptGetResponse::class,
+    ];
+
     public function __construct(
         private Session $session,
         private Request $request,

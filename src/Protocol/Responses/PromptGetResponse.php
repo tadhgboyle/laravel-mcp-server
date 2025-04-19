@@ -2,19 +2,37 @@
 
 namespace Aberdeener\LaravelMcpServer\Protocol\Responses;
 
+use Aberdeener\LaravelMcpServer\PromptRegistry;
+use Aberdeener\LaravelMcpServer\Protocol\Error;
+use Aberdeener\LaravelMcpServer\Protocol\Exceptions\RequestException;
 use Aberdeener\LaravelMcpServer\Protocol\Prompts\Prompt;
 use Aberdeener\LaravelMcpServer\Request;
 use Aberdeener\LaravelMcpServer\Session;
 
 class PromptGetResponse extends Response
 {
+    private Prompt $prompt;
+
+    private array $arguments;
+
     public function __construct(
         private Session $session,
         private Request $request,
-        private Prompt $prompt,
-        private array $arguments,
     ) {
         parent::__construct($session, $request);
+
+        $promptName = $this->request->message()['params']['name'];
+        $prompt = app(PromptRegistry::class)->getPrompt($promptName);
+
+        if (! $prompt) {
+            throw new RequestException(
+                "Prompt not found: {$promptName}",
+                Error::EntityNotFound,
+            );
+        }
+
+        $this->prompt = $prompt;
+        $this->arguments = $this->request->message()['params']['arguments'];
     }
 
     public function attributes(): array

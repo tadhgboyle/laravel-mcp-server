@@ -2,61 +2,69 @@
 
 namespace Aberdeener\LaravelMcpServer\Protocol\Responses;
 
+use Aberdeener\LaravelMcpServer\Protocol\Error;
+use Aberdeener\LaravelMcpServer\Protocol\Exceptions\RequestException;
 use Aberdeener\LaravelMcpServer\Protocol\Tools\ResultType;
 use Aberdeener\LaravelMcpServer\Protocol\Tools\Tool;
 use Aberdeener\LaravelMcpServer\Request;
 use Aberdeener\LaravelMcpServer\Session;
+use Aberdeener\LaravelMcpServer\ToolRegistry;
 use InvalidArgumentException;
 use Throwable;
 
 class ToolCallResponse extends Response
 {
+    private Tool $tool;
+
+    private array $arguments;
+
     public function __construct(
         private Session $session,
         private Request $request,
-        private Tool $tool,
-        private array $arguments,
     ) {
         parent::__construct($session, $request);
+
+        $toolName = $this->request->message()['params']['name'];
+        $tool = app(ToolRegistry::class)->getTool($toolName);
+
+        if (! $tool) {
+            throw new RequestException(
+                "Tool not found: {$toolName}",
+                Error::EntityNotFound,
+            );
+        }
+
+        $this->tool = $tool;
+        $this->arguments = $this->request->message()['params']['arguments'];
     }
 
     public function attributes(): array
     {
-        $toolCallResponse = $this->toolCallResponse();
-        if (isset($toolCallResponse['error'])) {
+        try {
+            return [
+                'result' => [
+                    'content' => [
+                        $this->toolContent($this->tool->call(...$this->arguments)),
+                    ],
+                    'isError' => false,
+                ],
+            ];
+        } catch (Throwable $exception) {
             return [
                 'result' => [
                     'content' => [
                         [
                             'type' => 'text',
-                            'text' => $toolCallResponse['error'],
+                            'text' => $exception->getMessage(),
                         ],
                     ],
                     'isError' => true,
                 ],
             ];
         }
-
-        return [
-            'result' => [
-                'content' => [
-                    $this->toolContent($toolCallResponse['response']),
-                ],
-                'isError' => false,
-            ],
-        ];
     }
 
-    private function toolCallResponse(): array
-    {
-        try {
-            return ['response' => $this->tool->call(...$this->arguments)];
-        } catch (Throwable $exception) {
-            return ['error' => $exception->getMessage()];
-        }
-    }
-
-    private function toolContent($toolCallResponse): array
+    private function toolContent(string $toolCallResponse): array
     {
         switch ($this->tool->resultType()) {
             case ResultType::Text:

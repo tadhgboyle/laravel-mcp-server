@@ -7,7 +7,7 @@ use Aberdeener\LaravelMcpServer\Session;
 use Aberdeener\LaravelMcpServer\Tests\Fixtures\TestDummyPrompt;
 
 it('returns the list of prompts in their array format', function () {
-    $promptRegistry = new PromptRegistry;
+    $promptRegistry = app(PromptRegistry::class);
     $promptRegistry->registerPrompt(new TestDummyPrompt);
 
     $response = new PromptListResponse(new Session, new Request, $promptRegistry);

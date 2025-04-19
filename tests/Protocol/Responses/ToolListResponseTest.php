@@ -7,7 +7,7 @@ use Aberdeener\LaravelMcpServer\Tests\Fixtures\TestDummyTool;
 use Aberdeener\LaravelMcpServer\ToolRegistry;
 
 it('returns the list of tools in their array format', function () {
-    $toolRegistry = new ToolRegistry;
+    $toolRegistry = app(ToolRegistry::class);
     $toolRegistry->registerTool(new TestDummyTool);
 
     $response = new ToolListResponse(new Session, new Request, $toolRegistry);

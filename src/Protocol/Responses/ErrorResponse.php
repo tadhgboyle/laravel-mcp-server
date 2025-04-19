@@ -2,6 +2,7 @@
 
 namespace Aberdeener\LaravelMcpServer\Protocol\Responses;
 
+use Aberdeener\LaravelMcpServer\Protocol\Error;
 use Aberdeener\LaravelMcpServer\Request;
 use Aberdeener\LaravelMcpServer\Session;
 
@@ -10,8 +11,8 @@ class ErrorResponse extends Response
     public function __construct(
         private Session $session,
         private Request $request,
-        private string $error,
-        private int $code,
+        private string $message,
+        private Error $error,
     ) {
         parent::__construct($session, $request);
     }
@@ -20,8 +21,8 @@ class ErrorResponse extends Response
     {
         return [
             'error' => [
-                'code' => $this->code,
-                'message' => $this->error,
+                'code' => $this->error->value,
+                'message' => $this->message,
             ],
         ];
     }

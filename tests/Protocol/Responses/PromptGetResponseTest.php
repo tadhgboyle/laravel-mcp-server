@@ -1,12 +1,26 @@
 <?php
 
+use Aberdeener\LaravelMcpServer\PromptRegistry;
 use Aberdeener\LaravelMcpServer\Protocol\Responses\PromptGetResponse;
 use Aberdeener\LaravelMcpServer\Request;
 use Aberdeener\LaravelMcpServer\Session;
 use Aberdeener\LaravelMcpServer\Tests\Fixtures\TestDummyPrompt;
 
 it('returns prompt response data', function () {
-    $response = new PromptGetResponse(new Session, new Request, new TestDummyPrompt, ['echo "Hello world!";']);
+    $promptRegistry = app(PromptRegistry::class);
+    $promptRegistry->registerPrompt(new TestDummyPrompt);
+
+    $request = new Request;
+    $request->setMessage([
+        'params' => [
+            'name' => 'test_dummy',
+            'arguments' => [
+                'echo "Hello world!";',
+            ],
+        ],
+    ]);
+
+    $response = new PromptGetResponse(new Session, $request);
 
     expect($response->attributes())->toEqual([
         'result' => [

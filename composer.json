@@ -1,13 +1,12 @@
 {
     "name": "aberdeener/laravel-mcp-server",
-    "description": "This is my package laravel-mcp-server",
+    "description": "Provides STDIO MCP server support for Laravel applications.",
     "homepage": "https://github.com/tadhgboyle/laravel-mcp-server",
     "license": "MIT",
     "authors": [
         {
-            "name": "tadhgboyle",
-            "email": "tadhgsmboyle@gmail.com",
-            "role": "Developer"
+            "name": "Tadhg Boyle",
+            "email": "tadhgsmboyle@gmail.com"
         }
     ],
     "require": {
@@ -29,8 +28,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Aberdeener\\LaravelMcpServer\\": "src/",
-            "Aberdeener\\LaravelMcpServer\\Database\\Factories\\": "database/factories/"
+            "Aberdeener\\LaravelMcpServer\\": "src/"
         }
     },
     "autoload-dev": {

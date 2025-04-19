@@ -18,6 +18,7 @@ it('returns initialization data', function () {
                     'listChanged' => false,
                 ],
                 'resources' => [
+                    'subscribe' => false,
                     'listChanged' => false,
                 ],
                 'tools' => [

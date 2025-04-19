@@ -8,12 +8,15 @@ use Aberdeener\LaravelMcpServer\ToolRegistry;
 
 class ToolListResponse extends Response
 {
+    private ToolRegistry $toolRegistry;
+
     public function __construct(
         private Session $session,
         private Request $request,
-        private ToolRegistry $toolRegistry,
     ) {
         parent::__construct($session, $request);
+
+        $this->toolRegistry = app(ToolRegistry::class);
     }
 
     public function attributes(): array

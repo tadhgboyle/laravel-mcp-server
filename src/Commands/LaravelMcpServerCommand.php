@@ -2,17 +2,12 @@
 
 namespace Aberdeener\LaravelMcpServer\Commands;
 
-use Aberdeener\LaravelMcpServer\PromptRegistry;
+use Aberdeener\LaravelMcpServer\Protocol\Error;
+use Aberdeener\LaravelMcpServer\Protocol\Exceptions\RequestException;
 use Aberdeener\LaravelMcpServer\Protocol\Responses\ErrorResponse;
-use Aberdeener\LaravelMcpServer\Protocol\Responses\InitializeResponse;
-use Aberdeener\LaravelMcpServer\Protocol\Responses\PingResponse;
-use Aberdeener\LaravelMcpServer\Protocol\Responses\PromptGetResponse;
-use Aberdeener\LaravelMcpServer\Protocol\Responses\PromptListResponse;
-use Aberdeener\LaravelMcpServer\Protocol\Responses\ToolCallResponse;
-use Aberdeener\LaravelMcpServer\Protocol\Responses\ToolListResponse;
+use Aberdeener\LaravelMcpServer\Protocol\Responses\Response;
 use Aberdeener\LaravelMcpServer\Request;
 use Aberdeener\LaravelMcpServer\Session;
-use Aberdeener\LaravelMcpServer\ToolRegistry;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -27,11 +22,6 @@ class LaravelMcpServerCommand extends Command
         ob_implicit_flush(true);
 
         $stdin = fopen('php://stdin', 'r');
-        if ($stdin === false) {
-            Log::error('Failed to open STDIN.');
-
-            return self::FAILURE;
-        }
 
         $session = new Session;
         $request = new Request;
@@ -46,110 +36,54 @@ class LaravelMcpServerCommand extends Command
 
             $line = trim($line);
 
-            if (empty($line)) {
-                continue;
-            }
-
-            Log::debug('Raw input: '.$line);
+            Log::debug('Input: '.$line);
 
             $message = json_decode($line, true);
 
-            if (isset($message['method'])) {
-                if (! str_starts_with($message['method'], 'notifications/')) {
-                    $request->setId($message['id']);
-                }
+            $request->setMessage($message);
 
-                $method = $message['method'];
+            $method = $message['method'];
 
-                if ($method === 'initialize') {
-                    $response = new InitializeResponse(
-                        $session,
-                        $request
-                    )->toArray();
-                    $session->setInitialized();
-                    $this->sendJsonRpc($response);
-                } elseif ($method === 'tools/list') {
-                    $response = new ToolListResponse(
-                        $session,
-                        $request,
-                        app(ToolRegistry::class),
-                    )->toArray();
-                    $this->sendJsonRpc($response);
-                } elseif ($method === 'tools/call') {
-                    $toolRegistry = app(ToolRegistry::class);
-                    $tool = $toolRegistry->getTool($message['params']['name']);
-                    if ($tool === null) {
-                        $response = new ErrorResponse(
-                            $session,
-                            $request,
-                            "Unknown tool: {$message['params']['name']}",
-                            -32602,
-                        )->toArray();
-                        $this->sendJsonRpc($response);
-                    }
-
-                    $this->sendJsonRpc(new ToolCallResponse(
-                        $session,
-                        $request,
-                        $tool,
-                        $message['params']['arguments'],
-                    )->toArray());
-                } elseif ($method === 'prompts/list') {
-                    $response = new PromptListResponse(
-                        $session,
-                        $request,
-                        app(PromptRegistry::class),
-                    )->toArray();
-                    $this->sendJsonRpc($response);
-                } elseif ($method === 'prompts/get') {
-                    $promptRegistry = app(PromptRegistry::class);
-                    $prompt = $promptRegistry->getPrompt($message['params']['name']);
-                    if ($prompt === null) {
-                        $response = new ErrorResponse(
-                            $session,
-                            $request,
-                            "Unknown prompt: {$message['params']['name']}",
-                            -32602,
-                        )->toArray();
-                        $this->sendJsonRpc($response);
-                    }
-
-                    $this->sendJsonRpc(new PromptGetResponse(
-                        $session,
-                        $request,
-                        $prompt,
-                        $message['params']['arguments'],
-                    )->toArray());
-                } elseif ($method === 'prompts/initialize') {
-                    $response = new InitializeResponse(
-                        $session,
-                        $request
-                    )->toArray();
-                    $this->sendJsonRpc($response);
-                } elseif ($method === 'notifications/initialized') {
+            if (str_starts_with($message['method'], 'notifications/')) {
+                if ($method === 'notifications/initialized') {
                     Log::info('Received initialized notification.');
+
+                    continue;
                 } elseif ($method === 'notifications/cancelled') {
                     Log::info('Received cancelled notification.');
                     break;
-                } elseif ($method === 'ping') {
-                    $response = new PingResponse(
-                        $session,
-                        $request,
-                    )->toArray();
-                    $this->sendJsonRpc($response);
-                } else {
-                    if (isset($message['id'])) {
-                        $response = new ErrorResponse(
-                            $session,
-                            $request,
-                            'Method not found',
-                            -32601,
-                        )->toArray();
-                        $this->sendJsonRpc($response);
-                    }
                 }
             } else {
-                Log::warning('Unrecognized message format: '.json_encode($message));
+                $request->setId($message['id']);
+            }
+
+            if (! array_key_exists($method, Response::REQUEST_HANDLERS)) {
+                $this->sendResponse(new ErrorResponse(
+                    $session,
+                    $request,
+                    'Method not found',
+                    Error::MethodNotFound,
+                ));
+
+                continue;
+            }
+
+            $response = Response::REQUEST_HANDLERS[$method];
+
+            try {
+                $this->sendResponse(new $response(
+                    $session,
+                    $request,
+                ));
+            } catch (RequestException $exception) {
+                $this->sendResponse(new ErrorResponse(
+                    $session,
+                    $request,
+                    $exception->getMessage(),
+                    $exception->error,
+                ));
+
+                continue;
             }
         }
 
@@ -159,9 +93,9 @@ class LaravelMcpServerCommand extends Command
         return self::SUCCESS;
     }
 
-    private function sendJsonRpc(array $message): void
+    private function sendResponse(Response $response): void
     {
-        $json = json_encode($message, JSON_THROW_ON_ERROR);
+        $json = json_encode($response->toArray(), JSON_THROW_ON_ERROR);
         file_put_contents('php://stdout', $json."\n");
         fflush(STDOUT);
         Log::debug('Sent: '.$json);

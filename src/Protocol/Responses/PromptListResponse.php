@@ -8,12 +8,15 @@ use Aberdeener\LaravelMcpServer\Session;
 
 class PromptListResponse extends Response
 {
+    private PromptRegistry $promptRegistry;
+
     public function __construct(
         private Session $session,
         private Request $request,
-        private PromptRegistry $promptRegistry,
     ) {
         parent::__construct($session, $request);
+
+        $this->promptRegistry = app(PromptRegistry::class);
     }
 
     public function attributes(): array

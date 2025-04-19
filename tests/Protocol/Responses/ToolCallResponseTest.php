@@ -1,5 +1,6 @@
 <?php
 
+use Aberdeener\LaravelMcpServer\Protocol\Error;
 use Aberdeener\LaravelMcpServer\Protocol\Exceptions\RequestException;
 use Aberdeener\LaravelMcpServer\Protocol\Responses\ToolCallResponse;
 use Aberdeener\LaravelMcpServer\Protocol\Tools\ToolRegistry;
@@ -20,6 +21,7 @@ it('raises error when tool not found', function () {
 })->throws(
     RequestException::class,
     'Tool not found: non_existent_tool',
+    Error::EntityNotFound->value,
 );
 
 it('returns error when error was raised during tool call', function () {

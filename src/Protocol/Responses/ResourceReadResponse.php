@@ -25,7 +25,7 @@ class ResourceReadResponse extends Response
         if (! $resource) {
             throw new RequestException(
                 "Resource not found: {$resourceUri}",
-                Error::EntityNotFound,
+                Error::ResourceNotFound,
             );
         }
 

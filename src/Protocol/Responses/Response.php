@@ -16,7 +16,7 @@ abstract class Response
         'prompts/get' => PromptGetResponse::class,
         'resources/list' => ResourceListResponse::class,
         'resources/read' => ResourceReadResponse::class,
-        // 'resources/templates/list' => ResourceTemplateListResponse::class,
+        'resources/templates/list' => ResourceTemplatesListResponse::class,
     ];
 
     public function __construct(
